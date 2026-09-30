@@ -10,6 +10,12 @@ export function CloudLoader() {
       <circle className="puff" cx="114" cy="56" r="20" style={d(0.65)} />
     </svg><p>Forming clouds…</p></div>);
 }
+const SLOW_MS = 1200; // cloud only appears if something takes longer than this
+// small actions that should never show the big loader
+const quiet = (u, o) => {
+  const m = (o?.method || 'GET').toUpperCase(), url = String(u?.url || u);
+  return m === 'PATCH' || (m === 'GET' && /\/comments/.test(url));
+};
 export default function GlobalLoader() {
   const [show, setShow] = useState(true);
   useEffect(() => {
@@ -17,8 +23,8 @@ export default function GlobalLoader() {
     const idle = () => { clearTimeout(h); h = setTimeout(() => n === 0 && setShow(false), 300); };
     window.fetch = async (u, o) => {
       const hd = o?.headers || {};
-      if (hd['Next-Router-Prefetch'] || hd['next-router-prefetch']) return orig.call(window, u, o);
-      n++; clearTimeout(h); if (n === 1) t = setTimeout(() => setShow(true), 200);
+      if (quiet(u, o) || hd['Next-Router-Prefetch'] || hd['next-router-prefetch']) return orig.call(window, u, o);
+      n++; clearTimeout(h); if (n === 1) t = setTimeout(() => setShow(true), SLOW_MS);
       try { return await orig.call(window, u, o); }
       finally { n--; if (n === 0) { clearTimeout(t); idle(); } }
     };
