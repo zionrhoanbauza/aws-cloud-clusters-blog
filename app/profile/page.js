@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+const shrinkSq = f => new Promise(res => { const i = new Image(); i.onload = () => { const s = Math.min(i.width, i.height), c = document.createElement('canvas'); c.width = c.height = 200; c.getContext('2d').drawImage(i, (i.width - s) / 2, (i.height - s) / 2, s, s, 0, 0, 200, 200); res(c.toDataURL('image/jpeg', .8)); }; i.src = URL.createObjectURL(f); });
 export default function Profile() {
   const [u, setU] = useState(undefined), [mode, setMode] = useState('login'), [f, setF] = useState({ username: '', password: '' }), [err, setErr] = useState(''), [bio, setBio] = useState(''), [saved, setSaved] = useState(false);
   const load = () => fetch('/api/auth').then(r => r.json()).then(j => { setU(j.user); setBio(j.user?.bio || ''); });
