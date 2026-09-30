@@ -16,7 +16,7 @@ export async function GET(req) {
 export async function POST(req) {
   await init(); const u = await getUser(); if (!u) return Response.json({ error: 'Please log in first' }, { status: 401 });
   const { title, body, image, color, is_private } = await req.json();
-  if (!title?.trim() || !body?.trim()) return Response.json({ error: 'Title and description are required' }, { status: 400 });
+  if (!title?.trim()) return Response.json({ error: 'Title is required' }, { status: 400 });
   if (image && image.length > 600000) return Response.json({ error: 'Image too large' }, { status: 413 });
   const [r] = await sql`insert into posts(user_id,title,body,image,color,is_private) values(${u.id},${title.trim().slice(0, 100)},${body.slice(0, 5000)},${image || null},${color || 'lilac'},${!!is_private}) returning id`;
   return Response.json({ id: r.id });
