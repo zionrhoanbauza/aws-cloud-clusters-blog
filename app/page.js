@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-const COLORS = ['lilac', 'mint', 'sky', 'peach', 'lemon'];
+import PostModal from '@/components/PostModal';
+import { toHtml } from '@/lib/text';
 export default function Home() {
   const [me, setMe] = useState(null), [scope, setScope] = useState('all'), [arch, setArch] = useState(false), [page, setPage] = useState(1);
   const [d, setD] = useState({ posts: [], pages: 1 }), [open, setOpen] = useState(null);
@@ -10,7 +11,11 @@ export default function Home() {
   useEffect(() => { load(); }, [load]);
   useEffect(() => { if (!open) return; const k = e => e.key === 'Escape' && setOpen(null); addEventListener('keydown', k); return () => removeEventListener('keydown', k); }, [open]);
   const pick = s => { if (s === 'mine' && !me) return (location.href = '/profile'); setScope(s); setPage(1); setArch(false); };
-  async function patch(p, b) { await fetch('/api/posts/' + p.id, { method: 'PATCH', body: JSON.stringify(b) }); setOpen(o => (b.archived ? null : { ...o, ...b })); load(); }
+  async function patch(p, b) {
+    await fetch('/api/posts/' + p.id, { method: 'PATCH', body: JSON.stringify(b) });
+    const { pinned, ...rest } = b;
+    setOpen(o => (b.archived ? null : { ...o, ...rest, ...(pinned !== undefined && { is_pinned: pinned }) })); load();
+  }
   async function del(p) { if (!confirm('Delete this post permanently?')) return; await fetch('/api/posts/' + p.id, { method: 'DELETE' }); setOpen(null); load(); }
   const nums = d.pages <= 5 ? [...Array(d.pages)].map((_, i) => i + 1) : [1, 2, 3, '…', d.pages];
   return (<>
@@ -27,22 +32,12 @@ export default function Home() {
     </div>
     {!d.posts.length && <p>{scope === 'mine' ? (arch ? 'No archived posts.' : 'You have no posts yet — create one!') : 'No posts yet. Be the first!'}</p>}
     <div className="grid">{d.posts.map(p => (
-      <div key={p.id} className={`note${p.pinned ? ' pinned' : ''}`} data-c={p.color} role="button" tabIndex={0}
+      <div key={p.id} className={`note${p.is_pinned ? ' pinned' : ''}`} data-c={p.color} role="button" tabIndex={0}
         onClick={() => setOpen(p)} onKeyDown={e => e.key === 'Enter' && setOpen(p)}>
-        <h3>{p.title}</h3>{p.pinned && <span className="pin">Pinned</span>}
-        {p.image ? <img src={p.image} alt={`Cover image for ${p.title}`} /> : <div className="b">{p.body}</div>}
+        <h3>{p.title}</h3>{p.is_pinned && <span className="pin">Pinned</span>}
+        {p.has_image ? <img loading="lazy" src={`/api/posts/${p.id}/image`} alt={`Cover image for ${p.title}`} /> : <div className="b rt" dangerouslySetInnerHTML={{ __html: toHtml(p.body) }} />}
+        {p.ccount > 0 && <span className="cc" aria-label={`${p.ccount} comments`}>💬 {p.ccount}</span>}
       </div>))}</div>
-    {open && <div className="modal" onClick={() => setOpen(null)}><div className="sheet" role="dialog" aria-modal="true" aria-label={open.title} onClick={e => e.stopPropagation()}>
-      <h2>{open.title}</h2><div className="meta">by {open.username} · {new Date(open.created).toLocaleDateString()}{open.is_private && ' · Private'}</div>
-      {open.image && <img src={open.image} alt={`Cover image for ${open.title}`} />}
-      {open.body && <p style={{ whiteSpace: 'pre-wrap' }}>{open.body}</p>}
-      {me?.id === open.user_id && <div className="set">
-        <label><input type="checkbox" checked={open.pinned} onChange={e => patch(open, { pinned: e.target.checked })} /> Pin to top</label>
-        <label><input type="checkbox" checked={open.is_private} onChange={e => patch(open, { is_private: e.target.checked })} /> Private</label>
-        {COLORS.map(c => <button key={c} data-c={c} className="sw" aria-label={`Color ${c}`} style={{ background: 'var(--h)' }} onClick={() => patch(open, { color: c })} />)}
-        <button className="btn ghost sm" onClick={() => patch(open, { archived: !open.archived })}>{open.archived ? 'Restore' : 'Archive'}</button>
-        <button className="btn danger sm" onClick={() => del(open)}>Delete</button></div>}
-      <div className="set"><button className="btn ghost sm" onClick={() => setOpen(null)}>Close</button></div>
-    </div></div>}
+    {open && <PostModal post={open} me={me} onClose={() => setOpen(null)} patch={patch} del={del} onCount={load} />}
   </>);
 }
