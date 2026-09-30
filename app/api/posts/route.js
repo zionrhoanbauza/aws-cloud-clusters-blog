@@ -24,7 +24,7 @@ export async function POST(req) {
   if (!title?.trim()) return Response.json({ error: 'Title is required' }, { status: 400 });
   if (image && image.length > 600000) return Response.json({ error: 'Image too large' }, { status: 413 });
   let b = clean(body); if (!b.replace(/<[^>]*>/g, '').trim() && !b.includes('<hr')) b = '';
-  if (b.length > 20000) return Response.json({ error: 'Description is too long' }, { status: 400 });
+  if (!b) return Response.json({ error: 'Description is required' }, { status: 400 });
   const [r] = await sql`insert into posts(user_id,title,body,image,color,is_private) values(${u.id},${title.trim().slice(0, 100)},${b},${image || null},${color || 'lilac'},${!!is_private}) returning id`;
   return Response.json({ id: r.id });
 }
