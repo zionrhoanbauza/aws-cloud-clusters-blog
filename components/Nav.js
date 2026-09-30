@@ -8,5 +8,5 @@ export default function Nav() {
   const L = ([h, t]) => <Link key={h} href={h} className={path === h ? 'on' : ''}>{t}</Link>;
   return (<nav><Link href="/" className="logo"><b>AWS</b> Cloud Clusters Blog</Link>
     {[['/', 'Home'], ['/bloggers', 'Bloggers'], ['/about', 'About']].map(L)}
-    <Link href="/profile">{u ? u.username : 'Log in'}<span className="av" /></Link></nav>);
+    <Link href="/profile">{u ? u.username : 'Log in'}<span className="av" style={u?.avatar ? { backgroundImage: `url(${u.avatar})` } : undefined} /></Link></nav>);
 }
