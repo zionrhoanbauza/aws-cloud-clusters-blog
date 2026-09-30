@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Editor from '@/components/Editor';
 const shrink = f => new Promise(res => { const i = new Image(); i.onload = () => { const s = Math.min(1, 800 / i.width), c = document.createElement('canvas'); c.width = i.width * s; c.height = i.height * s; c.getContext('2d').drawImage(i, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', .7)); }; i.src = URL.createObjectURL(f); });
 export default function Create() {
   const r = useRouter(); const [f, setF] = useState({ title: '', body: '', color: 'lilac', is_private: false }), [img, setImg] = useState(null), [err, setErr] = useState('');
@@ -12,7 +13,7 @@ export default function Create() {
   }
   return (<div className="card"><h2>Create Post</h2>
     <label htmlFor="t">Title (required)</label><input id="t" required placeholder="Give your post a title..." value={f.title} onChange={e => setF({ ...f, title: e.target.value })} />
-    <label htmlFor="d">Description (optional)</label><textarea id="d" rows={8} placeholder="Write your post here..." value={f.body} onChange={e => setF({ ...f, body: e.target.value })} />
+    <label id="dl">Description (optional)</label><Editor labelledBy="dl" onChange={html => setF(s => ({ ...s, body: html }))} />
     <label>Cover Image</label><input type="file" accept="image/*" onChange={async e => e.target.files[0] && setImg(await shrink(e.target.files[0]))} />
     {img && <img src={img} alt="" style={{ maxWidth: 240, marginTop: 8, borderRadius: 6 }} />}
     <label>Note color</label><select value={f.color} onChange={e => setF({ ...f, color: e.target.value })}>{['lilac', 'mint', 'sky', 'peach', 'lemon'].map(c => <option key={c}>{c}</option>)}</select>
