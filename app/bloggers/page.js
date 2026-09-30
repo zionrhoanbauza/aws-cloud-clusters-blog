@@ -5,5 +5,6 @@ export default function Bloggers() {
   useEffect(() => { fetch('/api/bloggers').then(r => r.json()).then(j => setB(j.bloggers)); }, []);
   return (<><h2>Bloggers</h2><div className="grid">{b.map(x => (
     <div key={x.username} className="note" data-c="sky" style={{ cursor: 'default' }}>
-      <h3>@{x.username}</h3><div className="b">{x.bio || 'No bio yet.'}<br /><small>{x.n} public post{x.n === 1 ? '' : 's'}</small></div></div>))}</div></>);
+      <h3>@{x.username}</h3><div className="b"><span className="av" style={{ margin: '0 8px 0 0', width: 32, height: 32, backgroundImage: x.avatar ? `url(${x.avatar})` : 'none' }} />
+        {x.bio || 'No bio yet.'}<br /><small>{x.n} public post{x.n === 1 ? '' : 's'}</small></div></div>))}</div></>);
 }
