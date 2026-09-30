@@ -9,6 +9,9 @@ export default function Profile() {
   async function submit() { const r = await post({ action: mode, ...f }); if (!r.ok) return setErr((await r.json()).error); location.href = '/'; }
   if (u === undefined) return null;
   if (u) return (<div className="card"><h2>@{u.username}</h2><p className="meta">Member since {new Date(u.created).toLocaleDateString()}</p>
+    <div className="av" style={{ width: 96, height: 96, margin: '8px 0', backgroundImage: u.avatar ? `url(${u.avatar})` : 'none' }} />
+    <label htmlFor="pic">Profile picture</label>
+    <input id="pic" type="file" accept="image/*" onChange={async e => { const f = e.target.files[0]; if (!f) return; await post({ action: 'avatar', avatar: await shrinkSq(f) }); load(); }} />
     <label>Bio</label><textarea rows={3} maxLength={300} value={bio} onChange={e => { setBio(e.target.value); setSaved(false); }} />
     <div className="row"><button className="btn" onClick={async () => { await post({ action: 'bio', bio }); setSaved(true); }}>{saved ? 'Saved ✓' : 'Save bio'}</button>
       <button className="btn ghost" onClick={async () => { await post({ action: 'logout' }); location.href = '/'; }}>Log out</button></div></div>);
