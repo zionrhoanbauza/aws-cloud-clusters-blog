@@ -8,12 +8,13 @@ export default function Create() {
   const r = useRouter(); const [f, setF] = useState({ title: '', body: '', color: 'lilac', is_private: false }), [img, setImg] = useState(null), [err, setErr] = useState('');
   async function publish() {
     if (!f.title.trim()) return setErr('Please add a title.');
+    if (!f.body.replace(/<[^>]*>/g, '').trim()) return setErr('Please add a description.');
     const res = await fetch('/api/posts', { method: 'POST', body: JSON.stringify({ ...f, image: img }) }), j = await res.json();
     if (!res.ok) return setErr(res.status === 401 ? 'Please log in on the Profile page first.' : j.error); r.push('/');
   }
   return (<div className="card"><h2>Create Post</h2>
     <label htmlFor="t">Title (required)</label><input id="t" required placeholder="Give your post a title..." value={f.title} onChange={e => setF({ ...f, title: e.target.value })} />
-    <label id="dl">Description (optional)</label><Editor labelledBy="dl" onChange={html => setF(s => ({ ...s, body: html }))} />
+    <label id="dl">Description (required)</label><Editor labelledBy="dl" onChange={html => setF(s => ({ ...s, body: html }))} />
     <label>Cover Image</label><input type="file" accept="image/*" onChange={async e => e.target.files[0] && setImg(await shrink(e.target.files[0]))} />
     {img && <img src={img} alt="" style={{ maxWidth: 240, marginTop: 8, borderRadius: 6 }} />}
     <label>Note color</label><select value={f.color} onChange={e => setF({ ...f, color: e.target.value })}>{['lilac', 'mint', 'sky', 'peach', 'lemon'].map(c => <option key={c}>{c}</option>)}</select>
