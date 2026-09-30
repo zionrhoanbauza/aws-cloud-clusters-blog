@@ -42,3 +42,27 @@ input,textarea,select{width:100%;padding:10px;border:1px solid #8a8494;border-ra
 input[type=checkbox]{width:auto}
 label{display:block;margin:14px 0 4px}.card{max-width:720px;margin:auto}
 .err{color:#b3261e}.row{display:flex;gap:12px;margin-top:18px}
+
+main{position:relative;z-index:1}nav{position:relative;z-index:2}
+.logo{display:flex;align-items:center;gap:8px}.logo .ico{width:44px;height:31px;fill:#fff;flex:none}
+.sky{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.cloud{position:absolute;left:-30vw;fill:#b98ae0;opacity:.18;animation:drift linear infinite}
+@keyframes drift{to{transform:translateX(170vw)}}
+.loader{position:fixed;inset:0;z-index:50;display:grid;place-content:center;justify-items:center;gap:6px;background:#faf7fcf2}
+.loader p{margin:0;font:700 22px Kalam,cursive;color:var(--pd)}
+.puff{fill:#b98ae0;transform-box:fill-box;transform-origin:50% 100%;transform:scale(0);animation:form 2s ease-in-out infinite}
+@keyframes form{0%{transform:scale(0);opacity:0}25%{opacity:1}45%,80%{transform:scale(1);opacity:1}100%{transform:scale(1);opacity:0}}
+@media(prefers-reduced-motion:reduce){.cloud{animation:none;left:var(--x)}.puff{animation:none;transform:none}}
+.tb{display:flex;flex-wrap:wrap;gap:4px;padding:6px;border:1px solid #8a8494;border-bottom:0;border-radius:6px 6px 0 0;background:#f1ecf6}
+.tb button{min-width:36px;height:36px;padding:0 8px;border:1px solid #cfc6d9;background:#fff;border-radius:6px;color:#1d1428}
+.tb button:hover{background:#e7dcf3}
+.ed{min-height:180px;border:1px solid #8a8494;border-radius:0 0 6px 6px;padding:10px;background:#fff;overflow:auto}
+.ed:empty::before{content:attr(data-ph);color:#6f677c}
+.rt ul,.rt ol{padding-left:1.4em;margin:.3em 0}.rt a{color:var(--pd);text-decoration:underline}
+.rt h4{margin:.3em 0;font-size:1.15em}.rt hr{border:0;border-top:2px dashed #b9a8cc;margin:.5em 0}
+.rt blockquote{border-left:3px solid var(--p);margin:.3em 0;padding-left:10px;color:#4a3d5c}
+.note .b.rt ul,.note .b.rt ol,.note .b.rt blockquote,.note .b.rt h4,.note .b.rt hr{margin:0}
+.cmts{margin-top:18px;padding:10px 14px;border-top:1px dashed #999;background:#fffdf5;line-height:1.4;border-radius:6px}
+.cmts ul{list-style:none;padding:0;margin:8px 0}.cmts li{padding:8px 0;border-bottom:1px solid #e6e0ee}
+.lnk{border:0;background:none;color:#b3261e;text-decoration:underline;margin-left:10px;padding:0;font-size:14px}
+.cc{position:absolute;bottom:8px;right:8px;background:var(--h);color:#fff;font-size:12px;padding:2px 8px;border-radius:999px}
