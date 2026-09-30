@@ -6,12 +6,13 @@ const shrink = f => new Promise(res => { const i = new Image(); i.onload = () =>
 export default function Create() {
   const r = useRouter(); const [f, setF] = useState({ title: '', body: '', color: 'lilac', is_private: false }), [img, setImg] = useState(null), [err, setErr] = useState('');
   async function publish() {
+    if (!f.title.trim()) return setErr('Please add a title.');
     const res = await fetch('/api/posts', { method: 'POST', body: JSON.stringify({ ...f, image: img }) }), j = await res.json();
     if (!res.ok) return setErr(res.status === 401 ? 'Please log in on the Profile page first.' : j.error); r.push('/');
   }
   return (<div className="card"><h2>Create Post</h2>
-    <label>Title</label><input placeholder="Give your post a title..." value={f.title} onChange={e => setF({ ...f, title: e.target.value })} />
-    <label>Description</label><textarea rows={8} placeholder="Write your post here..." value={f.body} onChange={e => setF({ ...f, body: e.target.value })} />
+    <label htmlFor="t">Title (required)</label><input id="t" required placeholder="Give your post a title..." value={f.title} onChange={e => setF({ ...f, title: e.target.value })} />
+    <label htmlFor="d">Description (optional)</label><textarea id="d" rows={8} placeholder="Write your post here..." value={f.body} onChange={e => setF({ ...f, body: e.target.value })} />
     <label>Cover Image</label><input type="file" accept="image/*" onChange={async e => e.target.files[0] && setImg(await shrink(e.target.files[0]))} />
     {img && <img src={img} alt="" style={{ maxWidth: 240, marginTop: 8, borderRadius: 6 }} />}
     <label>Note color</label><select value={f.color} onChange={e => setF({ ...f, color: e.target.value })}>{['lilac', 'mint', 'sky', 'peach', 'lemon'].map(c => <option key={c}>{c}</option>)}</select>
